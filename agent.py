@@ -21,7 +21,6 @@ openai.api_key = os.getenv('api_key')
 os.environ['OPENAI_API_KEY'] = os.getenv('api_key')
 
 st.set_page_config(page_title="GuoGenius", page_icon="💡")
-# st.image(Image.open(Path("./pics/dnas-logo.png")))
 st.title("💡 GuoGenius")
 
 # Define session state messages
