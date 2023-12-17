@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run conversationalAgent.py
+web: sh setup.sh && streamlit run agent.py
