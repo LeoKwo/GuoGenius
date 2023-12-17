@@ -1,0 +1,36 @@
+Front-end technology:
+React
+Redux
+Bootstrap
+Ant Design
+
+Back-end and database:
+Java
+Python
+SQL
+Spring Boot
+FastAPI
+Node.js
+Express.js
+MongoDB
+MySQL
+Docker
+AWS Lambda
+AWS LightSail
+Heroku
+Netlify
+Azure
+MongoDB Atlas
+Firebase
+Digital Ocean
+
+Android Development
+Kotlin
+React Native
+Retrofit
+
+GenAI Development
+LangChain
+LlamaIndex
+Streamlit
+Azure / AWS
