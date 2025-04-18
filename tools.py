@@ -1,14 +1,14 @@
-from typing import Optional
-import pinecone
-from llama_index.vector_stores import PineconeVectorStore
-from llama_index.embeddings.openai import OpenAIEmbedding
+from pinecone import Pinecone
+from llama_index.vector_stores.pinecone import PineconeVectorStore
+# from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.core import StorageContext
+from llama_index.core import VectorStoreIndex
 import os
-from llama_index.tools import FunctionTool, QueryEngineTool, ToolMetadata
-from llama_index import ServiceContext, GPTVectorStoreIndex
+from llama_index.core.tools import QueryEngineTool, ToolMetadata
 from dotenv import load_dotenv
 import openai
-from langchain.tools import DuckDuckGoSearchRun, Tool, HumanInputRun
-from langchain.utilities import SerpAPIWrapper, WikipediaAPIWrapper
+from langchain.tools import DuckDuckGoSearchRun, Tool
+from langchain.utilities import WikipediaAPIWrapper
 from langchain.chains import LLMMathChain
 from langchain.llms import OpenAI
 import requests
@@ -21,28 +21,24 @@ load_dotenv()
 openai.api_key = os.getenv('api_key')
 os.environ['OPENAI_API_KEY'] = os.getenv('api_key')
 os.environ['PINECONE_API_KEY'] = os.getenv('pinecone_api_key')
-os.environ['PINECONE_ENVIRONMENT'] = os.getenv('pinecone_env')
-sampro_api_key = os.getenv('sampro_api_key')
 
 # Connect to Pinecone
 index_name = "ruikang-guo-knowledge-base"
-pinecone.init(
-    api_key=os.environ['PINECONE_API_KEY'],
-    environment=os.environ['PINECONE_ENVIRONMENT']
-)
-pinecone_index = pinecone.Index(index_name)
-embed_model = OpenAIEmbedding(model='text-embedding-ada-002', embed_batch_size=100)
-service_context = ServiceContext.from_defaults(embed_model=embed_model)
+pc = Pinecone(api_key=os.environ['PINECONE_API_KEY'])
+pinecone_index = pc.Index(index_name)
 
 # Ruikang Guo QA Tool
-rkguo_vector_store = PineconeVectorStore(
+vector_store = PineconeVectorStore(
     pinecone_index=pinecone_index,
 )
-rkguo_index = GPTVectorStoreIndex.from_vector_store(
-    vector_store=rkguo_vector_store,
-    service_context=service_context
+
+storage_context = StorageContext.from_defaults(vector_store=vector_store)
+index = VectorStoreIndex.from_vector_store(
+    vector_store=vector_store,
+    storage_context=storage_context
 )
-rkguo_query_engine = rkguo_index.as_query_engine()
+
+rkguo_query_engine = index.as_query_engine()
 rkguo_tool = QueryEngineTool(
     query_engine=rkguo_query_engine,
     metadata=ToolMetadata(
