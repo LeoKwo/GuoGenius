@@ -1,9 +1,9 @@
 # GuoGenius
-AI-powered digital persona of Ruikang Guo. Ask it any question you would ask about Ruikang's resume, professional experiences, and education backgrounds.
+GuoGenius中国宝宝特供版
 #### Deployment
-Deployed on Heroku [https://guogenius-e9cbdf445f45.herokuapp.com/](https://guogenius-e9cbdf445f45.herokuapp.com/)
+部署在阿里云轻量化服务器上。使用qwen-turbo
 #### Avaible on...
-[https://rkguo.xyz/](https://rkguo.xyz/)
+[https://ruikang.tech/](https://ruikang.tech/)
 ### Running the bot
 ```
 streamlit run agent.py
