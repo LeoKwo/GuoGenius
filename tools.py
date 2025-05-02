@@ -1,73 +1,29 @@
-from pinecone import Pinecone
-from llama_index.vector_stores.pinecone import PineconeVectorStore
-# from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.core import StorageContext
-from llama_index.core import VectorStoreIndex
-import os
-from llama_index.core.tools import QueryEngineTool, ToolMetadata
+from llama_index.embeddings.dashscope import DashScopeEmbedding
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from dotenv import load_dotenv
-import openai
-from langchain.tools import DuckDuckGoSearchRun, Tool
-from langchain.utilities import WikipediaAPIWrapper
-from langchain.chains import LLMMathChain
-from langchain.llms import OpenAI
-import requests
-import json
-from duckduckgo_search import DDGS
-# from langchain. vectorstores import Pinecone
+import os
+from llama_index.core import Settings
+from llama_index.llms.dashscope import DashScope, DashScopeGenerationModels
+from langchain_core.tools import tool
 
-# Load environment variables from .env file
 load_dotenv()
-openai.api_key = os.getenv('api_key')
-os.environ['OPENAI_API_KEY'] = os.getenv('api_key')
-os.environ['PINECONE_API_KEY'] = os.getenv('pinecone_api_key')
 
-# Connect to Pinecone
-index_name = "ruikang-guo-knowledge-base"
-pc = Pinecone(api_key=os.environ['PINECONE_API_KEY'])
-pinecone_index = pc.Index(index_name)
-
-# Ruikang Guo QA Tool
-vector_store = PineconeVectorStore(
-    pinecone_index=pinecone_index,
+Settings.embed_model = DashScopeEmbedding(
+    model_name='text-embedding-v3',
+    text_type='document',
+    api_key=os.getenv('DASHSCOPE_API_KEY')
 )
+documents = SimpleDirectoryReader("./docs").load_data()
 
-storage_context = StorageContext.from_defaults(vector_store=vector_store)
-index = VectorStoreIndex.from_vector_store(
-    vector_store=vector_store,
-    storage_context=storage_context
-)
+index = VectorStoreIndex.from_documents(documents)
 
-rkguo_query_engine = index.as_query_engine()
-rkguo_tool = QueryEngineTool(
-    query_engine=rkguo_query_engine,
-    metadata=ToolMetadata(
-        name="ruikang_guo_factual_qa_tool",
-        description="Information about Ruikang Guo. Contains information from his resume, a list of his tech stacks, and his cover letter."
-    )
-)
-rkguo_lc_tool = rkguo_tool.to_langchain_tool()
+# Initialize DashScope object
+dashscope_llm = DashScope(model_name=DashScopeGenerationModels.QWEN_TURBO, api_key=os.getenv('DASHSCOPE_API_KEY'))
 
-# DuckDuckGoSearch
-ddg_search = DuckDuckGoSearchRun()
-ddg_search_lc_tool = Tool(
-    name="DuckDuckGoSearch",
-    func=ddg_search.run,
-    description="Useful for when you need to do a search on the internet to find information that another tool can't find. be specific with your input."
-)
+chat_engine = index.as_chat_engine(llm=dashscope_llm)
 
-# Wikipedia
-wikipedia = WikipediaAPIWrapper()
-wikipedia_lc_tool = Tool(
-    name="WikipediaSearch",
-    func=wikipedia.run,
-    description="Useful for when you need to look up a topic, event or person on wikipedia"
-)
+@tool
+def resumeTool(q: str):
+    """Call to get information about Ruikang Guo."""
+    return chat_engine.chat(q)
 
-# Calculator
-math = LLMMathChain.from_llm(OpenAI())
-math_lc_tool = Tool(
-    name="Calculator",
-    func=math.run,
-    description="Useful for when you need to do math calculations."
-)
