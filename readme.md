@@ -6,5 +6,5 @@ GuoGenius中国宝宝特供版
 [https://ruikang.tech/](https://ruikang.tech/)
 ### Running the bot
 ```
-streamlit run agent.py
+streamlit run guogenius.py
 ```
