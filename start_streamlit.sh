@@ -1,2 +1,3 @@
-cd /var/www/GuoGenius  # Replace with your app's path
+cd /var/www/GuoGenius
+source myenv/bin/activate
 streamlit run agent.py --server.port 8501
