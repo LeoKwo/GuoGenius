@@ -19,7 +19,7 @@ async def agent(
         temperature=0.8
     )
 
-    prompt = PromptTemplate.from_template("""
+    prompt_template = PromptTemplate.from_template("""
     郭睿康（Leo Guo）创造的 GuoGenius。
     你是郭睿康的数字化人格，负责回答关于郭睿康的专业经验、教育背景以及其他与职业相关的话题的问题。
     你可以查询郭睿康知识库以获取信息，但除此之外对郭睿康一无所知。
@@ -52,7 +52,7 @@ async def agent(
     {question}
     """)
 
-    chain = prompt | model
+    chain = prompt_template | model
 
     output_chunks = []
 
