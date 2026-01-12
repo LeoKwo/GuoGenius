@@ -9,7 +9,7 @@ def run_agent(prompt) -> str:
     streaming_placeholder = st.empty()
 
     with streaming_placeholder.container():
-        with st.spinner(text="思考中"):
+        with st.spinner(text="🧠"):
             async def wrapper_gen():
 
                 async for chunk in agent(
